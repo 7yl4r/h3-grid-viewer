@@ -10,11 +10,14 @@
     "mapbox-gl": "^2.7.0"
   },
   "devDependencies": {
-    "budo": "^11.7.0"
+    "budo": "^11.7.0",
+    "watchify": "^4.0.0"
   },
   "scripts": {
     "build": "browserify src/index.js -o static/bundle.js",
-    "dev": "budo src/index.js --live --dir static"
+    "dev": "npm run-script watchify & npm run-script budo",
+    "budo": "budo src/index.js --live --dir static",
+    "watchify": "watchify src/index.js -o static/bundle.js"
   },
   "author": "Matthias Feist"
 }

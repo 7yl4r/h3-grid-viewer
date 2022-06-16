@@ -47,7 +47,12 @@ map.on('load', () => {
     source: 'tiles-geojson',
     type: 'fill',
     paint: {
-      'fill-color': ['case', ['get', 'pentagon'], 'rgba(255,0,0,0.5)', 'rgba(0,0,0,0.1)']
+      'fill-color': [
+        'get', 'tile_color'
+        // 'case', ['get', 'pentagon'],  // case statement on 'pentagon' property
+        // 'rgba(255,0,0,0.5)',  // if pentagon= true color for pentagons (red)
+        // 'rgba(0,0,0,0.1)'     // else color for not pentagons
+      ]
     }
   });
 
@@ -107,7 +112,7 @@ function updateTiles() {
     {
       type: 'FeatureCollection',
       features: h3indexes.map(getTileFeature)
-    });
+  });
 
   map.getSource('tiles-centers-geojson').setData({
     type: 'FeatureCollection',
@@ -134,20 +139,30 @@ function getExtentsGeom() {
   ];
 }
 
+const hex_values_object = {
+    "8009fffffffffff": 255,
+    "801ffffffffffff": 100
+}
+
 function getTileFeature(h3index) {
-  const feature = geojson2h3.h3ToFeature(h3index, {
-    pentagon: h3.h3IsPentagon(h3index),
-  })
+  const feature = geojson2h3.h3ToFeature(
+      h3index,
+      {
+        pentagon: h3.h3IsPentagon(h3index),
+        tile_color: 'rgba(0,' + hex_values_object[h3index] + ',0,0.3)'
+      }
+  );
   fixTransmeridian(feature)
   return feature
 }
 
 function getTileCenterFeature(h3index) {
+  // add text to center of the hexes
   var center = h3.h3ToGeo(h3index)
   return {
     type: 'Feature',
     properties: {
-      text: h3index + '\nRes: ' + h3.h3GetResolution(h3index),
+      text: h3index + '\nResolution: ' + h3.h3GetResolution(h3index),
       highlight: h3index === h3IndexToHighlight
     },
     geometry: {
@@ -164,7 +179,7 @@ function h3ResToMapZoom(res) {
   return Math.ceil((res + 3) * 1.2)
 }
 
-/**************************** 
+/****************************
  * the follwing functions are copied from
  * https://observablehq.com/@nrabinowitz/mapbox-utils#fixTransmeridian
  ****************************/
