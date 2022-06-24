@@ -108,6 +108,7 @@ function updateTiles() {
 
   const h3indexes = extendH3IndexesByOne(h3.polyfill(extentsGeom, h3res, true))
 
+  console.log('updating tiles');
   map.getSource('tiles-geojson').setData(
     {
       type: 'FeatureCollection',
@@ -139,10 +140,7 @@ function getExtentsGeom() {
   ];
 }
 
-const hex_values_object = {
-    "8009fffffffffff": 255,
-    "801ffffffffffff": 100
-}
+var hex_values_object = {};
 
 function getTileFeature(h3index) {
   const feature = geojson2h3.h3ToFeature(
@@ -228,3 +226,26 @@ function fixTransmeridian(feature) {
       throw new Error(`Unknown geometry type: ${geometryType}`);
   }
 }
+
+
+// json upload button
+document.getElementById('import').onclick = function() {
+  var files = document.getElementById('selectFiles').files;
+  console.log(files);
+  if (files.length <= 0) {
+    return false;
+  }
+
+  var fr = new FileReader();
+
+  fr.onload = function(e) {
+    // console.log(e);
+    var result = JSON.parse(e.target.result);
+    var formatted = JSON.stringify(result, null, 2);
+    document.getElementById('result').value = formatted;
+    hex_values_object = result;
+    updateTiles();
+  }
+
+  fr.readAsText(files.item(0));
+};

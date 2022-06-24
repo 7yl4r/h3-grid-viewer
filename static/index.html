@@ -53,6 +53,10 @@
             <a href="https://github.com/matthiasfeist/what-the-h3index">See this project on Github</a>
         </div>
         <div class="map-overlay-inner">
+            <span>Upload .json h3 file</span>
+            <input type="file" id="selectFiles" value="Import" /><br />
+            <button id="import">Import</button>
+            <textarea id="result"></textarea>
             <span>Zoom to H3 index:</span>
             <input id="zoomToIndex" type="text" pattern="[0-9a-f]{15}">
         </div>
