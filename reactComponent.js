@@ -1,41 +1,45 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-// import geobuf from 'geobuf';
-// import Pbf from 'pbf';
 import { Layer, Source } from 'react-map-gl';
-// import { useMediaQuery } from 'react-responsive';
-// import { preferredTemperatureUnit } from '../../../utils';
-// import { brandingConfig } from '../../../config';
-
-const s3UrlBase = 'https://seagull-visualization-layers.s3.us-east-2.amazonaws.com';
+// TODO: add h3 react import
 
 const CoastalFloodUmich = (props) => {
   const {
-    UTCPath,
-    // selectedLake,
+    // UTCPath,
+    // // selectedLake,
   } = props;
 
-  // const isMobile = useMediaQuery({ maxWidth: 767 });
   const [isLoading, setIsLoading] = useState(false);
-  const [floodLayers, setFloodLayers] = useState([]);
 
-  const fetchFloodUmich = async () => {
-    // const floodUrl = `${s3UrlBase}${UTCPath}/floodModel.geojson`;
-    const floodUrl = `${s3UrlBase}/flood_test/testFloodMiHuron_15.geojson`;
-    const floodResponse = await fetch(floodUrl);
-    const floodData = await floodResponse.json();
-    return floodData;
+  // TODO: something like this:
+  const [extentsGeom, setExtentsGeom] = useState([]);
+
+  // if floodLayers changes, setFloodLayers is called:
+  // state variable is floodLayers
+  // setFloodLayers is a standard setter that sets the state variable to
+  //    whatever is passed to it.
+  //const [floodLayers, setFloodLayers] = useState([]);
+
+  const fetchH3JSON = async () => {
+    // fetch the h3 .json file & load it
+    // TODO: finish this
+    const floodUrl = 'https://github.com/raw/etc/generated_h3_data.json';
+    const dataResponse = await fetch(floodUrl);
+    const dataJSON = await dataResponse.json();
+    return dataJSON;
   };
 
   const fetchData = async () => {
+    // this `const [floodDataRawMHG]` syntax creates an
+    //     anon function declaration that assigns return value
+    //     to the bracketed variable
     const [floodDataRawMHG] = await Promise.all([
-      fetchFloodUmich(),
+      fetchH3JSON(),
     ]);
     await setFloodLayers([
       {
-        lake: 'primaryLake',
         sourceId: 'primaryLakeSource',
-        data: floodDataRawMHG,
+        data: floodDataRawMHG,  //
       },
     ]);
     setIsLoading(false);
@@ -71,7 +75,7 @@ const CoastalFloodUmich = (props) => {
   return (
     <>
       {floodLayers.map((floodLayer, index) => (
-        <Source
+        <Source  // TODO: bring the map.addSource into here
           id={floodLayer.sourceId}
           type="geojson"
           data={floodLayer.data}
@@ -79,7 +83,7 @@ const CoastalFloodUmich = (props) => {
         />
       ))}
       {floodLayers.map((floodLayer, index) => (
-        <Layer
+        <Layer  // TODO: bring in map.addLayer stuff
           id={floodLayer.lake}
           source={floodLayer.sourceId}
           {...floodStyle}
@@ -89,13 +93,15 @@ const CoastalFloodUmich = (props) => {
     </>
   );
 };
-CoastalFloodUmich.defaultProps = {
-  UTCPath: '',
-  selectedLake: '',
-};
-CoastalFloodUmich.propTypes = {
-  UTCPath: PropTypes.string,
-  selectedLake: PropTypes.string,
-};
+// // set property default values
+// CoastalFloodUmich.defaultProps = {
+//   UTCPath: '',
+//   selectedLake: '',
+// };
+// // set types of properties
+// CoastalFloodUmich.propTypes = {
+//   UTCPath: PropTypes.string,
+//   selectedLake: PropTypes.string,
+// };
 
 export default CoastalFloodUmich;

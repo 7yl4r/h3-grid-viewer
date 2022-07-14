@@ -17,6 +17,7 @@ let map = new mapboxgl.Map({
 });
 
 map.on('load', () => {
+  // hex data
   map.addSource('tiles-geojson', {
     type: 'geojson',
     data: {
@@ -25,6 +26,7 @@ map.on('load', () => {
     }
   });
 
+  // text in the middle of each hex
   map.addSource('tiles-centers-geojson', {
     type: 'geojson',
     data: {
@@ -33,6 +35,7 @@ map.on('load', () => {
     }
   });
 
+  // lines around
   map.addLayer({
     id: 'tiles',
     source: 'tiles-geojson',
@@ -109,12 +112,14 @@ function updateTiles() {
   const h3indexes = extendH3IndexesByOne(h3.polyfill(extentsGeom, h3res, true))
 
   console.log('updating tiles');
+  // get the color of the hex
   map.getSource('tiles-geojson').setData(
     {
       type: 'FeatureCollection',
       features: h3indexes.map(getTileFeature)
   });
 
+  // get the text for the center
   map.getSource('tiles-centers-geojson').setData({
     type: 'FeatureCollection',
     features: h3indexes.map(getTileCenterFeature)
